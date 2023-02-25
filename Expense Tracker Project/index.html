@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="/style.css" />
+    <!-- <script type="javascript" src="/script.js"></script> -->
+  </head>
+  <body>
+    <h2>Expense Tracker</h2>
+    <div class="container">
+      <h4>Your Balance</h4>
+      <h1 id="balance">$0.00</h1>
+      <div class="inc-exp-container">
+        <div>
+          <h4>Income</h4>
+          <p id="money-plus" class="money-plus">+$0.00</p>
+        </div>
+        <div>
+          <h4>Expense</h4>
+          <p id="money-minus" class="money-minus">-$0.00</p>
+        </div>
+      </div>
+
+      <h3>History</h3>
+      <ul id="list" class="list">
+        <!-- <li class="minus">
+          Cash <span>-$400</span
+          ><button class="delete-btn">x</button>
+        </li> -->
+      </ul>
+      <h3>Add New Transition</h3>
+      <form id="form">
+        <div class="form-control">
+          <label for="text">Text</label>
+          <input type="text" id="text" placeholder="Enter Text...." autofocus />
+        </div>
+        <div class="form-control">
+          <label for="amount"
+            >Amount <br />
+            (negative - expense ,positive - income )</label
+          >
+          <input type="number" id="amount" placeholder="Enter amount..." />
+          <small class="smallMsgBoth" style="display: none"
+            >*Both fields are required</small
+          >
+        </div>
+      </form>
+      <button class="btn" id="btn">ADD TRANSACTION</button>
+    </div>
+    <!--------------------------------------- JAVASCRIPT -------------------------------------->
+    <script>
+      let list = document.getElementById("list");
+      let dashboardInc = document.getElementById("money-plus");
+      let dashboardExp = document.getElementById("money-minus");
+      let finalBalance = document.getElementById("balance");
+      let addTransactionBtn = document.getElementById("btn");
+      let transactionName = document.getElementById("text");
+      let transactionAmt = document.getElementById("amount");
+
+      //FETCHING LOCAL STORAGE DATA
+      let storageData = JSON.parse(localStorage.getItem("transactionSource"));
+      console.log(storageData);
+      let transactionSource = (storageData !== null) ? [...storageData] : [];
+      console.log(transactionSource)
+      postTransactionInDOM(transactionSource);
+      // let transactionSource = [];
+
+      //   [
+      //   { transNum: 1, transName: "Rice", sign: "-", transAmt: 20.00 },
+      //   { transNum: 2, transName: "Ragi", sign: "-", transAmt: 10.00 },
+      //   { transNum: 3, transName: "Millet", sign: "-", transAmt: 20.00 },
+      //   { transNum: 4, transName: "Salary", sign: "+", transAmt: 30.00 },
+      //   ];
+
+      addTransactionBtn.addEventListener("click", function(){
+        if(transactionName.value !== "" && transactionAmt.value !== ""){          
+          pushTransactiontoSource(transactionSource);
+        }
+        console.log(localStorage)
+        postTransactionInDOM(transactionSource); 
+      });
+
+      function pushTransactiontoSource(source){
+        source.push({ transNum: source.length + 1, transName: transactionName.value, transAmt: Number(transactionAmt.value) });
+        //UPDATE LOCAL STORAGE
+        localStorage.setItem("transactionSource", JSON.stringify(source));
+      }
+
+      function postTransactionInDOM(source){
+        list.innerHTML = "";
+         source.forEach((currObj) => {
+          if(currObj.transAmt > 0){
+            list.innerHTML += `<li class="plus" data-id="${currObj.transNum}">${currObj.transName} <span>+$${Math.abs(currObj.transAmt).toFixed(2)}</span><button onclick="deleteEntry(this)" class="delete-btn">x</button></li>`
+            updateDashboardIncome(transactionSource);
+          }else{
+            list.innerHTML += `<li class="minus" data-id="${currObj.transNum}">${currObj.transName} <span>-$${Math.abs(currObj.transAmt).toFixed(2)}</span><button onclick="deleteEntry(this)" class="delete-btn">x</button></li>`
+            updateDashboardExp(transactionSource); 
+          }
+          updateTotalBalance(transactionSource);
+         });   
+      }
+
+      function updateDashboardIncome(source){
+          let income = [];
+          for(i = 0; i < source.length; i++){
+            if(source[i].transAmt > 0){
+              income.push(source[i].transAmt);
+            }
+          }
+          console.log("Income array", income);
+          if(income.length > 0){            
+            let totalIncome = income.reduce((init, sec) => init + sec);
+            console.log("Total Income", totalIncome);
+            dashboardInc.innerHTML = "+$" + totalIncome.toFixed(2);
+          }else{
+            dashboardInc.innerHTML = "+$0.00";
+          }
+      }
+
+      function updateDashboardExp(source){
+        let expense = [];
+          for(i = 0; i < source.length; i++){
+            if(source[i].transAmt < 0){
+              expense.push(source[i].transAmt);
+            }
+          }  
+          console.log("Expense array", expense);
+          if(expense.length > 0){            
+            let totalExp = expense.reduce((init, sec) => init + sec);      
+            console.log("Total Expense", totalExp);
+            dashboardExp.innerHTML = "-$" + Math.abs(totalExp).toFixed(2);
+          }else{
+            dashboardExp.innerHTML = "-$0.00";
+          }
+      }      
+
+      function updateTotalBalance(source){
+        let balance = source.map((currObj) => currObj.transAmt)
+        if(balance.length > 0){
+          let finalBal = balance.reduce((init, sec) => init + sec);
+          console.log("Final Balance", finalBal);
+          finalBalance.innerHTML = (finalBal > 0) ? "+$" + finalBal.toFixed(2) : "-$" + Math.abs(finalBal).toFixed(2)
+        }else{
+          finalBalance.innerHTML = "$0.00";
+        }
+      }
+
+      function deleteEntry(curBtn){
+        let curBtnId = curBtn.parentElement.getAttribute("data-id");
+        console.log("Current Button ID", curBtnId, typeof curBtnId); //String
+        let filteredTransactions = transactionSource.filter(curObj => curObj.transNum !== Number(curBtnId))
+        console.log("Filtered Transactions array", filteredTransactions)
+        transactionSource = filteredTransactions;
+        //UPDATE LOCAL STOARGE
+        localStorage.setItem("transactionSource", JSON.stringify(transactionSource));
+        updateDashboardIncome(transactionSource);
+        updateDashboardExp(transactionSource);
+        updateTotalBalance(transactionSource);
+        curBtn.parentElement.remove();
+      }
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Guessing Game</title>
+    <style>
+      .container {
+        text-align: center;
+        width: 40rem;
+        border: 1px solid black;
+        border-radius: 20px;
+        margin: 10% auto;
+      }
+      .colorBox {
+        height: 100px;
+        width: 200px;
+        background-color: #bbb;
+        /* border-radius: 50%; */
+        /* background-color: aqua; */
+        display: inline-block;
+        /* border-radius: 15%; */
+      }
+      #rgbOuter {
+        /* width: 45%; */
+      }
+      #rgbContainer {
+        font-size: x-large;
+        font-weight: 600;
+        font-family: monospace;
+      }
+      #resetBtn {
+        height: 2rem;
+        width: 15rem;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+      }
+      .title {
+        font-size: x-large;
+        font-weight: 600;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3 class="title">Color Guessing Game</h3>
+      <div id="rgbOuter">
+        <p id="rgbContainer"></p>
+      </div>
+      <span class="colorBox"></span>
+      <span class="colorBox"></span>
+      <span class="colorBox"></span><br />
+      <span class="colorBox"></span>
+      <span class="colorBox"></span>
+      <span class="colorBox"></span><br /><br />
+      <button id="resetBtn">Reset Game</button>
+    </div>
+
+    <!------------------------------------------------JAVASCRIPT------------------------------------------------>
+    <script>
+      const rgbOuter = document.getElementById("rgbOuter");
+      const rgbContainer = document.getElementById("rgbContainer");
+      const colorBox = document.querySelectorAll(".colorBox");
+      const resetBtn = document.getElementById("resetBtn");
+
+      function initializeAddEvents() {
+        for (let i = 0; i < colorBox.length; i++) {
+          colorBox[i].style.visibility = "visible";
+          colorBox[i].style.backgroundColor = `rgb(${Math.trunc(
+            Math.random() * 256
+          )},${Math.trunc(Math.random() * 256)},${Math.trunc(
+            Math.random() * 256
+          )})`;
+          // colorBox[i].innerHTML = colorBox[i].style.backgroundColor;   //-------> UNCOMMENT THIS TO SEE THE RGB VALUES OF THE COLOR BOXES
+        }
+
+        rgbContainer.innerHTML =
+          colorBox[
+            Math.trunc(Math.random() * colorBox.length)
+          ].style.backgroundColor; //rgb number
+        rgbOuter.style.backgroundColor = `${rgbContainer.innerHTML}`; //Computed color
+        rgbOuter.style.backgroundColor = "transparent";
+
+        for (let i = 0; i < colorBox.length; i++) {
+          colorBox[i].addEventListener("click", function () {
+            if (colorBox[i].style.backgroundColor !== rgbContainer.innerHTML) {
+              colorBox[i].style.visibility = "hidden";
+            } else {
+              rgbOuter.style.backgroundColor = `${rgbContainer.innerHTML}`;
+              for (let j = 0; j < colorBox.length; j++) {
+                colorBox[j].addEventListener("click", function () {
+                  colorBox[j].style.visibility = "visible";
+                });
+              }
+            }
+          });
+        }
+      }
+
+      initializeAddEvents();
+
+      //RESETTING THE GAME
+      resetBtn.addEventListener("click", initializeAddEvents);
+    </script>
+  </body>
+</html>

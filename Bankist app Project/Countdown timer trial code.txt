@@ -1,0 +1,44 @@
+let m = 1
+// let s = 600;
+
+function countdownseconds(){
+  let s = 10; //set to 60
+  setInterval(()=>{
+    if(m > -1){
+      if(s > -1){
+      s--
+    }
+     if(s == -1){
+        s = 9; //set to 59
+       
+        m--; 
+                
+      }     
+      if(m == 0 && s == 0){
+        // m = (m.toString().length < 2) ? "0" + m.toString() : m.toString();
+        // s = (s.toString().length < 2) ? "0" + s.toString() : m.toString();  
+        // console.log(`${m}:${s}`)       
+      }
+    m = (m.toString().length < 2) ? "0" + m.toString() : m.toString();
+    s = (s.toString().length < 2) ? "0" + s.toString() : m.toString();  
+      console.log(`${m}:${s}`)
+    }
+  },1000)
+}
+
+
+// function countdownminutes(){
+//   let m = 10; //1 * 10
+//   setInterval(()=>{
+//     if(m > -1){
+//       console.log("minutes", m--)
+//     }
+//   },60000)
+// }
+
+
+function countdown(){
+  countdownseconds();
+  // countdownminutes();
+}
+// countdown();

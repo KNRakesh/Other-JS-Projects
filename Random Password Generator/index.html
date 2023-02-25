@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Password Generator</title>
+    <style>
+      .container {
+        text-align: center;
+      }
+      input[type="text"] {
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+      }
+      input[type="numeric"] {
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+      }
+
+      #generateBtn {
+        background-color: #4caf50; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+      #requiredLength {
+        text-align: center;
+        width: 5rem;
+        border-radius: 5px;
+      }
+      #resultPassword {
+        text-align: center;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Random Password Generator</h3>
+      <input type="text" id="resultPassword" readonly /><br /><br />
+      <small id="smallMsg">Enter the required length for your password</small
+      ><br />
+      <input type="numeric" id="requiredLength" /><br />
+      <button id="generateBtn">Generate</button>
+    </div>
+
+    <!-------------------------------------------JAVASCRIPT---------------------------------------------->
+    <script>
+      const resultPassword = document.getElementById("resultPassword");
+      let requiredLength = document.getElementById("requiredLength");
+      const generateBtn = document.getElementById("generateBtn");
+      let smallMsg = document.getElementById("smallMsg");
+
+      const charStr =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*~()-+=^";
+      console.log(charStr.length);
+      generateBtn.addEventListener("click", function () {
+        if (requiredLength.value > charStr.length) {
+          smallMsg.innerText = `*Enter a number less than ${
+            charStr.length + 1
+          }!`;
+          smallMsg.style.color = "red";
+          resultPassword.value = "";
+        } else {
+          let charCount = "";
+          for (i = 0; i < requiredLength.value; i++) {
+            charCount += charStr[Math.trunc(Math.random() * charStr.length)];
+            resultPassword.value = charCount;
+            smallMsg.innerText = "Enter the required length for your password";
+            smallMsg.style.color = "initial";
+          }
+        }
+      });
+
+      // console.log(charStr[Math.trunc(Math.random() * charStr.length)]);
+    </script>
+  </body>
+</html>

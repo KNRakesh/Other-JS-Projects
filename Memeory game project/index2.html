@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+
+    <style>
+      .row {
+        display: inline-block;
+      }
+      /*TEST CSS*/
+      .flip-box {
+        background-color: transparent;
+        width: 150px;
+        height: 150px;
+        /* border: 5px solid black; */
+        perspective: 1000px;
+        padding: 0.2rem;
+      }
+
+      .flip-box-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+      }
+
+      /* .flip-box:hover .flip-box-inner {
+  transform: rotateY(180deg);
+} */
+
+      /* .flip-box-inner {
+  transform: rotateY(180deg);
+} */
+
+      .flip-box-front,
+      .flip-box-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+
+      .flip-box-front {
+        background-color: #bbb;
+        color: black;
+      }
+
+      .flip-box-back {
+        background-color: #555;
+        color: white;
+        transform: rotateY(180deg);
+      }
+      
+      #animalNumber{
+        width: 15rem;
+      }
+      
+      #cardsContainer{
+        width: 40rem;
+        border: 3px solid black;
+        padding: 1rem 0.8rem 1rem 1rem;
+        background-color: rgb(255, 255, 255);
+      }
+
+      .game-tile-image, .animalImage{
+        width: 150px;
+        height: 150px;
+      }
+      #gameContainer{
+        background-color: rgb(226, 228, 150);
+        border: 3px solid black;
+        width: 42rem;
+        padding: 10px;
+        margin: auto;
+      }
+      h2{
+        margin: auto;
+        padding: 0 15rem 0 15rem;
+        /* 0 250px 0 250px */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gameContainer">
+    <h2>Memory Game</h2>
+    <p>Enter the number of animals</p>
+    <input type="text" id="animalNumber" placeholder="Enter a number between 3 & 10" autofocus>
+    <button id="startGameBtn">START GAME</button><br><br>
+    <div id="cardsContainer">
+    </div>
+    <div class="score">
+      <p>Score: <span id="score-value">0</span></p>
+      <p>Failed Attempts: <span id="failed-attempts-value">0</span></p>
+    </div>
+
+    <div>
+      <button id="resetBtn">Reset Game</button>
+    </div>
+  </div>
+<!----------------------------------------------------------JAVASCRIPT---------------------------------------------------------->
+    <script>
+      const cardsContainer = document.getElementById("cardsContainer");
+      const animalNumber = document.getElementById("animalNumber");
+      const startGameButton = document.getElementById("startGameBtn"); 
+      let scoreValue = document.getElementById("score-value");
+      let fialedAttemptsValue = document.getElementById("failed-attempts-value");
+      let resetButton = document.getElementById("resetBtn");
+
+      let animals = ["cow", "elephant", "frog", "kangaroo", "lion", "monkey", "peacock", "rabbit", "raccoon", "squirrel"];
+      let clickedArr = [];
+      let score = 0;
+      let fialedAttempts = 0;
+
+      //FUNCTION TO RESET THE GAMAE
+      function resetGame(){
+        cardsContainer.innerHTML = "";
+        score = 0;
+        scoreValue.innerHTML = score;
+        fialedAttempts = 0;
+        fialedAttemptsValue.innerHTML = fialedAttempts;
+      }
+
+      resetButton.addEventListener("click", function(){resetGame()})
+
+      //FUNCTION TO SHUFFLE AN ARRAY
+      function shuffleArray(arr) {
+        for (let i = arr.length -1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i+1));
+        let k = arr[i];
+        arr[i] = arr[j];
+        arr[j] = k;
+      } 
+      return arr;
+    }
+        
+      startGameButton.addEventListener("click", function(){    
+        resetGame();      
+        shuffleArray(animals)      
+        if(animalNumber.value !== "" && (Number(animalNumber.value >= 3) && Number(animalNumber.value <= 10))){            
+            let finalAnimalNumber = Number(animalNumber.value); 
+            console.log(finalAnimalNumber, typeof finalAnimalNumber) //Number
+            selectRandomAnimals(finalAnimalNumber);
+            animalNumber.value = "";
+        }
+      })  
+
+      //FUNCTION TO SELECT THAT MANY RANDOM ANIMAL IMAGES FROM 'allShuffledAnimals'
+      function selectRandomAnimals(animalNum){
+        let selectedAnimals = [];
+        for(i = 0; i < animalNum; i++){            
+            console.log(animals[i], typeof animals[i]); //String
+            selectedAnimals.push({id: selectedAnimals.length + 1, animal: animals[i], animalCount: animals[i] + "-1"}, 
+                                 {id: selectedAnimals.length + 2, animal: animals[i], animalCount: animals[i] + "-2"}) //THIS IS WHERE WE PUSH THE OBJECTS TO 'selectedAnimals' ARRAY
+        }
+        console.log("Final shuffled array of animal objects with which we play the game", shuffleArray(selectedAnimals))
+        insertSelectedAnimalsToDOM(shuffleArray(selectedAnimals))
+        }
+     
+        //FUNCTION TO INSERT THE ARRAY ELEMENTS OF 'selectedAnimals' INTO THE DOM
+        function insertSelectedAnimalsToDOM(selectedArr){
+            for(i = 0; i < selectedArr.length; i++){
+                let mainNode = document.createElement("div");
+                mainNode.classList.add("flip-box", "row");
+                let nodeTwo = document.createElement("div");
+                nodeTwo.classList.add("flip-box-inner");
+                mainNode.appendChild(nodeTwo);
+
+                let nodeThree = document.createElement("div");
+                nodeThree.classList.add("flip-box-front");
+                nodeTwo.appendChild(nodeThree);
+
+                let blankImg = document.createElement("img");
+                blankImg.classList.add("game-tile-image");
+                blankImg.setAttribute("id", "image-" + `${selectedArr[i].id}`);
+                blankImg.setAttribute("src", "images/blank.jpeg")
+                nodeThree.appendChild(blankImg);
+
+                let nodeFour = document.createElement("div");
+                nodeFour.classList.add("flip-box-back");
+                nodeTwo.appendChild(nodeFour);
+
+                let animalImage = document.createElement("img");
+                animalImage.classList.add("animalImage");
+                animalImage.setAttribute("src", `images/${selectedArr[i].animal}.jpeg`)
+                animalImage.setAttribute("id", `${selectedArr[i].animalCount}`)
+                nodeFour.appendChild(animalImage);
+                //ADDING CARDS TO THE GAME
+                cardsContainer.appendChild(mainNode)       
+                
+                mainNode.addEventListener("click", function() {
+                    //FLIP TO SHOW ANIMAL IMAGE
+                    nodeTwo.style.transform =
+                    "rotateY(180deg)";
+                    //ADD THE CLICKED ANIMAL'S IMAGE TAG TO 'clickedArr'
+                    console.log(animalImage); 
+                    clickedArr.push(animalImage);
+                    console.log("clicked Array", clickedArr); 
+                    //IF 'clickedArr' LENGTH IS 2, COMPARE FOR MATCH
+                    if(clickedArr.length == 1){
+                      clickedArr[0].parentElement.parentElement.parentElement.style.pointerEvents = "none";
+                    }
+                    if(clickedArr.length === 2){
+                      if(clickedArr[0].getAttribute("src") === clickedArr[1].getAttribute("src")){      //MATCH SCENARIO
+                        clickedArr = [];  //CLEAR ARRAY
+                        score += 1;
+                        scoreValue.innerHTML = score;
+                      }else{                                                                             //MISMATCH SCENARIO
+                        setTimeout(function(){              
+                          clickedArr.forEach(function(currEle){
+                            currEle.parentElement.parentElement.style.transform = "rotateY(0deg)";
+                            currEle.parentElement.parentElement.parentElement.style.pointerEvents = "auto";
+                          })                                   
+                          clickedArr = [];
+                          fialedAttempts += 1;
+                          fialedAttemptsValue.innerHTML = fialedAttempts;
+                        },1000) 
+                        console.log("Mismatch");
+                      }
+                    }               
+                  
+                }
+              )
+      }
+      }               
+    </script>
+  </body>
+</html>

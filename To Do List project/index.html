@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TO-DO LIST</title>
+    <style>
+      .container {
+        text-align: center;
+        border: 1px solid black;
+        width: 50%;
+        margin: 0 auto;
+        border-radius: 5px;
+        padding-bottom: 2%;
+      }
+      #addBtn,
+      .deleteBtn,
+      .editBtn,
+      #saveChangesBtn,
+      #cancelChangesBtn {
+        background-color: #4caf50; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+      }
+      .deleteBtn {
+        background-color: #f44336;
+        font-size: 12px;
+        padding: 10px 10px;
+      }
+      .editBtn {
+        background-color: #e7e7e7;
+        color: black;
+        font-size: 12px;
+        padding: 10px 10px;
+      }
+      #saveChangesBtn {
+        color: #fff;
+        font-size: 12px;
+        padding: 10px 10px;
+      }
+      #cancelChangesBtn {
+        background-color: #f44336;
+        color: #fff;
+        font-size: 12px;
+        padding: 10px 10px;
+      }
+      #listContainer .listItem {
+        padding-right: 10rem;
+      }
+      input[type="text"] {
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+      }
+      #listContainer {
+        /* display: table;
+        margin: 0 auto; */
+        margin-left: -3rem;
+      }
+      .complete {
+        text-decoration: line-through;
+        padding: 7px;
+        background-color: antiquewhite;
+      }
+      .incomplete {
+        text-decoration: none;
+        background-color: antiquewhite;
+        padding: 7px;
+      }
+      #editBoxContainer {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      #editBox {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 26%;
+      }
+      li {
+        margin: 2px 2px;
+        list-style-type: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Enter the item to be added to the list</h3>
+      <input
+        type="text"
+        placeholder="Enter the item..."
+        id="inputField"
+        autofocus
+      />
+      <button id="addBtn">Add</button>
+      <ul id="listContainer"></ul>
+      <div id="editBoxContainer">
+        <div id="editBox">
+          <input
+            type="text"
+            placeholder="Edit your item..."
+            id="editInputField"
+          />
+          <button id="cancelChangesBtn">Cancel</button>
+          <button id="saveChangesBtn" onclick="updateData()">
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+  <!-------------------------------------------JAVASCRIPT------------------------------------------->
+  <script>
+    let inputFieldValue = document.getElementById("inputField");
+    const addButton = document.getElementById("addBtn");
+    const listContainer = document.getElementById("listContainer");
+    const editBoxContainer = document.getElementById("editBoxContainer");
+    const editInputField = document.getElementById("editInputField");
+    const cancelChangesBtn = document.getElementById("cancelChangesBtn");
+    const saveChangesBtn = document.getElementById("saveChangesBtn");
+
+    //FETCHING DATA FROM LOCAL STORAGE ON LOAD/ ON RELOAD
+    let fetchedData = JSON.parse(localStorage.getItem("data"));
+    data = fetchedData !== null ? fetchedData : [];
+    //FUNCTION TO POPULATE THE LIST WITH ITEMS
+    // function populateList(){
+    if (data.length > 0) {
+      data.forEach(function (currEle) {
+        listContainer.innerHTML += `<li><span class="listItem ${currEle.status}" id="${currEle.id}" style="cursor:pointer" onclick="status(this)">${currEle.text}</span><button class="deleteBtn" onclick="deleteItem(this)">Delete</button><button onclick="displayEditBox(this)" class="editBtn">Edit</button></li>`;
+      });
+      // }
+    }
+    // populateList()
+
+    //ADD ITEM TO LIST FUNCTIONALITY
+    addButton.addEventListener("click", () => {
+      if (inputFieldValue.value !== "") {
+        data.push({
+          id: `item-${data.length + 1}`,
+          text: inputFieldValue.value,
+          status: "incomplete",
+        });
+        listContainer.innerHTML = "";
+
+        // populateList();
+        data.forEach(function (currEle) {
+          listContainer.innerHTML += `<li><span class="listItem ${currEle.status}" id="${currEle.id}" style="cursor:pointer" onclick="status(this)">${currEle.text}</span><button class="deleteBtn" onclick="deleteItem(this)">Delete</button><button onclick="displayEditBox(this)" class="editBtn">Edit</button></li>`;
+        });
+
+        inputFieldValue.value = "";
+        inputFieldValue.focus();
+        // console.log("Array on clicking 'Add'", data)
+        //UPDATING LOCAL STORAGE
+        localStorage.setItem("data", JSON.stringify(data));
+        // console.log("localStorage", localStorage)
+      }
+      inputFieldValue.focus();
+    });
+
+    //DELETE ITEM FROM LIST FUNCTIONALITY
+    function deleteItem(currentItem) {
+      // console.log(currentItem.parentElement.firstChild.innerText, typeof currentItem.parentElement.firstChild.innerText)
+      // let sliced = currentItem.parentElement.innerText.slice(0, currentItem.parentElement.innerText.indexOf("Delete"))
+      let itemText = currentItem.parentElement.firstChild.innerText;
+      // console.log(itemText)
+      let filteredData = data.filter(function (currEle) {
+        return currEle.text !== itemText;
+      });
+      data = filteredData;
+      // console.log("Array on clicking 'Delete'", data); //WORKING
+      currentItem.parentElement.remove();
+      //UPDATING LOCAL STORAGE
+      localStorage.setItem("data", JSON.stringify(data));
+      // console.log("localStorage", localStorage)
+    }
+
+    //DONE FUNCTIONALITY
+    function status(currEle) {
+      if (currEle.classList.contains("complete")) {
+        currEle.classList.remove("complete");
+        currEle.classList.add("incomplete");
+        // console.log(currEle.getAttribute("id")) //WORKING
+        let elementId = currEle.getAttribute("id");
+        data.forEach(function (curr) {
+          if (curr.id == elementId) {
+            curr.status = "incomplete";
+          }
+        });
+        // console.log("Array after status change", data)
+      } else {
+        currEle.classList.remove("incomplete");
+        currEle.classList.add("complete");
+        // console.log(currEle.getAttribute("id"))
+        let elementId = currEle.getAttribute("id");
+        data.forEach(function (curr) {
+          if (curr.id == elementId) {
+            curr.status = "complete";
+          }
+        });
+        // console.log("Array after status change", data)
+      }
+      //UPDATE ARRAY IN LOCAL STORAGE
+      localStorage.setItem("data", JSON.stringify(data));
+    }
+
+    //EDIT FUNCTIONALITY
+    function displayEditBox(currentEl) {
+      editBoxContainer.style.display = "block";
+      editInputField.value = currentEl.parentElement.firstChild.innerHTML;
+      editInputField.setAttribute(
+        "data-editid",
+        currentEl.parentElement.firstChild.id
+      );
+    }
+
+    function updateData() {
+      let newValue = editInputField.value;
+      let editid = editInputField.getAttribute("data-editid");
+      data.forEach((item) => {
+        if (item.id == editid) {
+          item.text = newValue;
+        }
+      });
+      console.log("data after edit", data);
+      localStorage.setItem("data", JSON.stringify(data));
+      // close window
+      editBoxContainer.style.display = "none";
+      // repopulate dom
+      listContainer.innerHTML = "";
+      data.forEach(function (currEle) {
+        listContainer.innerHTML += `<li><span class="listItem ${currEle.status}" id="${currEle.id}" style="cursor:pointer" onclick="status(this)">${currEle.text}</span><button class="deleteBtn" onclick="deleteItem(this)">Delete</button><button onclick="displayEditBox(this)" class="editBtn">Edit</button></li>`;
+      });
+    }
+
+    cancelChangesBtn.addEventListener("click", () => {
+      editBoxContainer.style.display = "none";
+    });
+  </script>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form class="search-form">
+      <input type="text" class="search" placeholder="City or State" />
+      <ul class="suggestions">
+        <li>Filter for a city</li>
+        <li>or a state</li>
+      </ul>
+    </form>
+    <script>
+      let unorderedList = document.querySelector(".suggestions");
+      let listItem = document.getElementsByTagName("li");
+      const searchBar = document.querySelector(".search");
+
+      const endpoint =
+        "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
+
+      let data = [];
+
+      //   async function start() {
+      //     const rawData = await fetch(endpoint);
+      //     const dataJson = await rawData.json();
+      //     data.push(...dataJson);
+      //   }
+      //   start();
+
+      fetch(endpoint)
+        .then((blob) => blob.json())
+        .then((res) => {
+          data.push(...res);
+        });
+
+      searchBar.addEventListener("change", function (e) {
+        checkAndDisplay(e.target.value);
+      });
+      searchBar.addEventListener("keyup", function (e) {
+        checkAndDisplay(e.target.value);
+      });
+
+      function checkAndDisplay(searchTerm) {
+        console.log("searchTerm", searchTerm);
+        if (searchBar.value !== "") {
+          unorderedList.innerHTML = "";
+          let resultsArr = data.filter(function (d) {
+            return d.city.toLowerCase().includes(searchTerm.toLowerCase());
+          });
+          let resultsHtml = "";
+          resultsArr.forEach(function (res) {
+            resultsHtml += `<li><span class="hl">${res.city}, ${res.state}</span> <span class="population">${res.population}</span></li>`;
+          });
+          unorderedList.innerHTML = resultsHtml;
+        } else {
+          unorderedList.innerHTML =
+            "<li>Filter for a city</li><li>or a state</li>";
+        }
+      }
+    </script>
+  </body>
+</html>

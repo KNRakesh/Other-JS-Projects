@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JS + CSS Clock</title>
+  </head>
+  <body>
+
+    <div class="clock">
+      <div class="clock-face">
+        <div class="hand hour-hand"></div>
+        <div class="hand min-hand"></div>
+        <div class="hand second-hand"></div>
+      </div>
+    </div>
+
+    <style>
+      html {
+        background: #018ded url(https://unsplash.it/1500/1000?image=881&blur=5);
+        background-size: cover;
+        font-family: "helvetica neue";
+        text-align: center;
+        font-size: 10px;
+      }
+
+      body {
+        margin: 0;
+        font-size: 2rem;
+        display: flex;
+        flex: 1;
+        min-height: 100vh;
+        align-items: center;
+      }
+
+      .clock {
+        background-image: url(/clock.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-origin: padding-box;
+        width: 30rem;
+        height: 30rem;
+        border-radius: 50%;
+        margin: 50px auto;
+        position: relative;
+        padding: 2rem;
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1), inset 0 0 0 3px #efefef,
+          inset 0 0 10px black, 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform: translateY(
+          -3px
+        ); 
+      }
+
+      .hand {
+        width: 50%;
+        height: 5px;
+        top: 50%;
+        position: absolute;
+        transform: rotate(90deg);
+      }
+      .hour-hand{
+        background-color: red;        
+      }
+      .min-hand{
+        background-color: yellow;
+      }
+      .second-hand{
+        background-color: blue;
+      }
+    </style>
+
+    <script>
+      let hourHand = document.querySelector(".hour-hand");
+      let minuteHand = document.querySelector(".min-hand");
+      let secondsHand = document.querySelector(".second-hand");
+
+      const dateNow = new Date();
+      let hoursNow = dateNow.getHours();
+      let minutesNow = dateNow.getMinutes();
+      let secondsNow = dateNow.getSeconds();
+      console.log(hoursNow, typeof hoursNow, "HOUR - RED");
+      console.log(minutesNow, typeof minutesNow, "MINUTE - YELLOW");
+      console.log(secondsNow, typeof secondsNow, "SECOND -BLUE");
+    
+        let countSec = secondsNow * 6;  //BLUE HANDLE
+        let countMin = minutesNow * 6;  //YELLOW HANDLE
+        let countHour = hoursNow * 10;  //RED HANDLE           
+      
+        function getDegree() {        
+        countSec += 6;
+        countMin += (1/10);
+        countHour += (1/120);
+        secondsHand.style.transform = `rotate(${(countSec) + 90}deg)`;
+        secondsHand.style.transformOrigin = "right bottom";
+        minuteHand.style.transform = `rotate(${(countMin) + 90}deg)`;
+        minuteHand.style.transformOrigin = "right bottom";
+        hourHand.style.transform = `rotate(${(countHour) + 90}deg)`;
+        hourHand.style.transformOrigin = "right bottom";
+    }
+      setInterval(getDegree, 1000);
+
+    </script>
+  </body>
+</html>
